@@ -27,6 +27,11 @@ def retrieve_author(id):
     return author_resource.retrieve(id)
 
 
+@app.route('/author/<int:id>', methods=['PUT'])
+def update_author(id):
+    return author_resource.update(id, request)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
