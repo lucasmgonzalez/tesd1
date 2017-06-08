@@ -1,5 +1,6 @@
-from flask import abort,request
+from flask import abort,request, jsonify
 import MySQLdb
+import json
 
 class Resource:
     def __init__(self):
@@ -12,7 +13,7 @@ class Resource:
 
         authors = self.cursor.fetchall()
 
-        return authors
+        return jsonify(authors)
 
     def retrieve(self, id):
         sql = "SELECT * FROM authors WHERE id = '%d'" % id
@@ -21,29 +22,27 @@ class Resource:
 
         author = self.cursor.fetchone()
 
-        return author
+        return jsonify(author)
 
     def store(self, request):
 
-        # if not request.json or not 'name' in request.json or not 'citation_name' in request.json or not 'cpf' in request.json:
-        #     abort(400)
+        if not request.json or not 'name' in request.json or not 'citation_name' in request.json or not 'cpf' in request.json:
+            abort(400)
 
-        return len(request)
+        name = request.json['name']
+        citation_name = request.json['citation_name']
+        cpf = request.json['cpf']
 
-        # name = request.json['name']
-        # citation_name = request.json['citation_name']
-        # cpf = request.json['cpf']
-        #
-        # sql = "INSERT INTO authors (name, citation_name, cpf) VALUES(%s, %s, %s)" % (name, citation_name, cpf)
-        #
-        # try:
-        #     self.cursor.execute(sql)
-        #
-        #     self.db.commit()
-        # except:
-        #     self.db.rollback()
-        #
-        # return True
+        sql = "INSERT INTO authors (name, citation_name, cpf) VALUES(%s, %s, %s)" % (name, citation_name, cpf)
+
+        try:
+            self.cursor.execute(sql)
+
+            self.db.commit()
+        except:
+            self.db.rollback()
+
+        return jsonify({'message': 'created'})
 
     def update(self, id, name, citation_name, cpf):
         sql = "UPDATE authors SET name = %s, citation_name = %s, cpf = %s WHERE id = %d" % (name, citation_name, cpf, id)
@@ -61,8 +60,8 @@ class Resource:
 
         author = self.cursor.fetchone()
 
-        return author
+        return jsonify(author)
 
     def delete(self, id):
 
-        return True
+        return jsonify({'message': 'deleted'})
